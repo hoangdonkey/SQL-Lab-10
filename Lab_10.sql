@@ -59,8 +59,6 @@ GO
 
 EXEC sp_PriceIncrease 10
 GO
-SELECT * FROM Toys 
-GO
 
 CREATE PROCEDURE sp_QtyOnHand
 	@qty int
@@ -91,4 +89,101 @@ AS
 		EXEC sp_PriceIncrease 10
 		SELECT * FROM Toys
 	END
+GO
+
+ALTER PROC sp_PriceIncrease
+	@Increase money
+AS
+	BEGIN
+		UPDATE Toys SET UnitPrice+=@Increase
+		SELECT * FROM Toys
+	END
+GO
+
+ALTER PROC sp_QtyOnHand
+	@qty int
+AS
+	BEGIN
+		UPDATE Toys SET QtyOnHand+=@qty
+		SELECT * FROM Toys
+	END
+GO
+
+CREATE PROCEDURE sp_SpecificPriceIncrease
+AS
+	BEGIN
+		UPDATE Toys SET UnitPrice += QtyOnHand
+		SELECT * FROM Toys
+	END
+GO
+
+ALTER PROCEDURE sp_SpecificPriceIncrease
+AS
+	BEGIN
+		UPDATE Toys SET UnitPrice += QtyOnHand
+		SELECT COUNT(UnitPrice) AS AffectedColumn FROM Toys
+	END
+GO
+
+ALTER PROCEDURE sp_SpecificPriceIncrease
+AS
+	BEGIN
+		UPDATE Toys SET UnitPrice += QtyOnHand
+		SELECT COUNT(UnitPrice) AS AffectedColumn FROM Toys
+		EXEC sp_HeavyToys
+	END
+GO
+
+ALTER PROCEDURE sp_HeavyToys
+	@Weight int
+AS
+	BEGIN TRY
+		SELECT * FROM Toys WHERE NetWeight >= @Weight
+	END TRY
+	BEGIN CATCH
+		PRINT 'Error in processing the procedure!!'
+	END CATCH
+GO
+
+ALTER PROCEDURE sp_PriceIncrease
+	@Increase money
+AS
+	BEGIN TRY
+		UPDATE Toys SET UnitPrice+=@Increase
+		SELECT * FROM Toys	
+	END TRY
+	BEGIN CATCH
+		PRINT 'Error in processing the procedure!!'
+	END CATCH
+GO
+
+ALTER PROCEDURE sp_QtyOnHand
+	@qty int
+AS
+	BEGIN TRY
+		UPDATE Toys SET QtyOnHand+=@qty
+		SELECT * FROM Toys
+	END TRY
+	BEGIN CATCH
+		PRINT 'Error in processing the procedure!!'
+	END CATCH
+GO
+
+ALTER PROCEDURE sp_SpecificPriceIncrease
+AS
+	BEGIN TRY
+		UPDATE Toys SET UnitPrice += QtyOnHand
+		SELECT COUNT(UnitPrice) AS AffectedColumn FROM Toys
+		EXEC sp_HeavyToys
+	END TRY
+	BEGIN CATCH
+		PRINT 'Error in processing the procedure!!'
+	END CATCH
+GO
+
+
+DROP PROCEDURE sp_HeavyToys
+DROP PROCEDURE sp_PriceIncrease
+DROP PROCEDURE sp_QtyOnHand
+DROP PROCEDURE sp_SpecificPriceIncrease
 GO
